@@ -1,0 +1,74 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+typedef struct Patient {
+    char id[10];   // Hasta ID
+    char name[50]; // Hasta Adi
+    int age;       // Yas
+    char gender;   // Cinsiyet (M/F)
+    char condition[100]; // Hastalik durumu
+    int priority;  // Oncelik seviyesi (1-5, 1 en acil)
+    int prescriptionNumber; // Recete numarasi
+    struct Patient* next;
+} Patient;
+
+Patient* head = NULL;
+int prescriptionCounter = 1000; // Baslangic recete numarasi
+
+void addPatient(char* id, char* name, int age, char gender, char* condition, int priority) {
+    Patient* newPatient = (Patient*)malloc(sizeof(Patient));
+    strcpy(newPatient->id, id);
+    strcpy(newPatient->name, name);
+    newPatient->age = age;
+    newPatient->gender = gender;
+    strcpy(newPatient->condition, condition);
+    newPatient->priority = priority;
+    newPatient->prescriptionNumber = prescriptionCounter++;
+    newPatient->next = NULL;
+    
+    if (head == NULL || head->priority > priority) {
+        newPatient->next = head;
+        head = newPatient;
+    } else {
+        Patient* temp = head;
+        while (temp->next != NULL && temp->next->priority <= priority) {
+            temp = temp->next;
+        }
+        newPatient->next = temp->next;
+        temp->next = newPatient;
+    }
+}
+
+void displayPatients() {
+    Patient* temp = head;
+    printf("\nAcil Servis Hasta Listesi:\n");
+    while (temp != NULL) {
+        printf("\nID: %s\nAd: %s\nYas: %d\nCinsiyet: %c\nDurum: %s\nOncelik: %d\nRecete No: %d\n",
+               temp->id, temp->name, temp->age, temp->gender, temp->condition, temp->priority, temp->prescriptionNumber);
+        temp = temp->next;
+    }
+}
+
+void printAllPrescriptionDetails() {
+    Patient* temp = head;
+    printf("\nTum Hastalarin Recete Detaylari:\n");
+    while (temp != NULL) {
+        printf("\nHasta ID: %s\nAd: %s\nYas: %d\nCinsiyet: %c\nDurum: %s\nRecete No: %d\n",
+               temp->id, temp->name, temp->age, temp->gender, temp->condition, temp->prescriptionNumber);
+        temp = temp->next;
+    }
+}
+
+int main() {
+    addPatient("P001", "Ali Yilmaz", 45, 'M', "Kalp Krizi", 1);
+    addPatient("P002", "Ayse Kaya", 30, 'F', "Yuksek Ates", 3);
+    addPatient("P003", "Mehmet Can", 65, 'M', "Solunum Yetmezligi", 2);
+    
+    displayPatients();
+    
+    // Tum hastalarin recete detaylarini yazdirma
+    printAllPrescriptionDetails();
+    
+    return 0;
+}
